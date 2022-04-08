@@ -7,5 +7,7 @@ Help anomalous trichromatism to pass the test
 考虑Mobile端的UI设计  
 
 Desktop端实现思路：Python + OpenCV
-Mobile端实现思路：Android studio + OpenCV-Android-SDK
+Mobile端实现思路：Android studio + OpenCV-Android-SDK (Java!!!)
+先从调用手机摄像头开始，后熟悉OpenCV-Android-SDK的Sample
+先从色盲/色弱的理论知识先准备。 
 
