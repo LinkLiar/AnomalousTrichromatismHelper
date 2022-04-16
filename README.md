@@ -11,3 +11,6 @@ Mobile端实现思路：Android studio + OpenCV-Android-SDK (Java!!!)
 先从调用手机摄像头开始，后熟悉OpenCV-Android-SDK的Sample
 先从色盲/色弱的理论知识先准备。 
 
+https://kns.cnki.net/kcms/detail/detail.aspx?dbcode=CMFD&dbname=CMFD201501&filename=1015000121.nh&uniplatform=NZKPT&v=zNnYlDi0QOBXTNqKVPiVTocDXTR-XQsF4kmbRXDaxQWv3fMiLuDsALQ7PzGLt_jL
+
+https://kns.cnki.net/kcms/detail/detail.aspx?dbcode=CMFD&dbname=CMFD2012&filename=1011194956.nh&uniplatform=NZKPT&v=g3BuGagE3d9R3Lbesew953aDMEWYMqwZSlLwURWJasCaxKlGzXurpXKJELJsa4HQ
