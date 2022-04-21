@@ -37,4 +37,5 @@ https://kns.cnki.net/kcms/detail/detail.aspx?dbcode=CMFD&dbname=CMFD2012&filenam
 
 准备知识：
 LSM颜色空间
-人眼LSM椎细胞
+人眼LSM视锥细胞
+原理：颜色空间几何变换映射
