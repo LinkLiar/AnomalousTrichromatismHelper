@@ -40,6 +40,23 @@ LSM颜色空间
 人眼LSM视锥细胞
 原理：颜色空间几何变换映射
 
+1．按使用类别分类
+
+彩色色度学模型：CIE-RGB、CIE-XYZ、均匀色差彩色模型（CIE 1976Luv和CIE Lab）
+
+工业彩色模型：RGB彩色显示模型、CMYK彩色印制模型、彩色传输模型YUV（PAL）、YIQ（NTSC）、YCrCb（数字高清晰度电视）
+
+视觉彩色模型：HVC（孟赛尔）、HSB（Photoshop）、HLS（Windows画图和Apple Color Picker）、HSI（图像分割）、HSY（电视）、Ohta（图像分割）等。
+
+2．按颜色感知分类
+
+混合颜色模型：按3种基色的比例混合而成的颜色。RGB、CMYK、XYZ等
+
+非线形亮度/色度颜色模型：用一个分量表示非色彩的感知，用两个分量表示色彩的感知，这两个分量都是色差属性。L*a*b、L*u*v、YUV、YIQ等。
+
+强度/饱和度/色调模型：用强度描述亮度或灰度等光强的感知，用饱和度和色调描述色彩的感知，这两个分量接近人眼对颜色的感觉。如HIS、HSL、HSV、LCH等
+
+
 1.全色盲
 全色盲是色盲中最为严重的，也是极为少见的一种色盲，属于完全性视锥细胞功能障碍（三种锥细胞缺失），与夜盲（视杆细胞功能障碍）恰好相反，患者尤喜暗、畏光，表现为昼盲。
 全色盲不能识别颜色，只能感知亮度信息，七彩世界在其眼中是一片灰暗，如同观黑白电视一般仅有明暗之分，而无颜色差别。
@@ -69,3 +86,121 @@ LSM颜色空间
 实际上，这种方式只是对色彩进行简单的滤除，并不能达到很好矫正的目的。
 
 
+#include <opencv2\opencv.hpp>
+#include <iostream>
+
+using namespace std;
+using namespace cv;
+
+Mat RGB2LAlphBeta(Mat3b &src)
+{
+    Mat3f L_AlphBeta(src.rows, src.cols);
+    //cvtColor(src,dest,CV_BGR2XYZ);
+    float X, Y, Z, L, M, S, _L, Alph, Beta;
+    int R, G, B;
+    for (int i = 0; i < src.rows; i++)
+    {
+        for (int j = 0; j < src.cols; j++)
+        {
+            B = src(i, j)[0];
+            G = src(i, j)[1];
+            R = src(i, j)[2];
+
+
+            X = (0.4124 * R) + (0.3576 * G) + (0.1805 * B);
+            Y = (0.2126 * R) + (0.7152 * G) + (0.0722 * B);
+            Z = (0.0193 * R) + (0.1192 * G) + (0.9505 * B);
+
+            L = (0.3897 * X) + (0.6890 * Y) + (-0.0787 * Z);
+            M = (-0.2298 * X) + (1.1834* Y) + (0.0464 * Z);
+            S = (0.0000 * X) + (0.0000 * Y) + (1.0000 * Z);
+
+            //for handling log
+            if (L == 0.0000) L = 1.0000;
+            if (M == 0.0000) M = 1.0000;
+            if (S == 0.0000) S = 1.0000;
+
+
+            //LMS to Lab
+            _L = (1.0 / sqrt(3.0)) *((1.0000 * log10(L)) + (1.0000 * log10(M)) + (1.0000 * log10(S)));
+            Alph = (1.0 / sqrt(6.0)) * ((1.0000 * log10(L)) + (1.0000 * log10(M)) + (-2.0000 * log10(S)));
+            Beta = (1.0 / sqrt(2.0)) * ((1.0000 * log10(L)) + (-1.0000 * log10(M)) + (-0.0000 * log10(S)));
+
+            L_AlphBeta(i, j)[0] = _L;
+            L_AlphBeta(i, j)[1] = Alph;
+            L_AlphBeta(i, j)[2] = Beta;
+        }
+    }
+
+    return L_AlphBeta;
+}
+
+Mat LAlphBeta2RGB(Mat3f &src)
+{
+    Mat3f XYZ(src.rows, src.cols);
+    Mat3b BGR(src.rows, src.cols);
+
+    float X, Y, Z, L, M, S, _L, Alph, Beta;
+    for (int i = 0; i < src.rows; i++)
+    {
+        for (int j = 0; j < src.cols; j++)
+        {
+            _L = src(i, j)[0] * 1.7321;
+            Alph = src(i, j)[1] * 2.4495;
+            Beta = src(i, j)[2] * 1.4142;
+
+            /*Inv_Transform_logLMS2lab =
+
+            0.33333   0.16667   0.50000
+            0.33333   0.16667  -0.50000
+            0.33333  -0.33333   0.00000*/
+            L = (0.33333*_L) + (0.16667 * Alph) + (0.50000 * Beta);
+            M = (0.33333 * _L) + (0.16667 * Alph) + (-0.50000 * Beta);
+            S = (0.33333 * _L) + (-0.33333 * Alph) + (0.00000* Beta);
+
+            L = pow(10, L);
+            if (L == 1) L = 0;
+            M = pow(10, M);
+            if (M == 1) M = 0;
+            S = pow(10, S);
+            if (S == 1) S = 0;
+            /*Inv_Transform_XYZ2LMS
+
+            1.91024  -1.11218   0.20194
+            0.37094   0.62905   0.00001
+            0.00000   0.00000   1.00000*/
+
+            X = (1.91024 *L) + (-1.11218 * M) + (0.20194 * S);
+            Y = (0.37094 * L) + (0.62905 * M) + (0.00001 * S);
+            Z = (0.00000 * L) + (0.00000 * M) + (1.00000 * S);
+            /*Inv_Transform_RGB2XYZ
+            3.240625  -1.537208  -0.498629
+            -0.968931   1.875756   0.041518
+            0.055710  -0.204021   1.056996*/
+
+            BGR(i, j)[2] = saturate_cast<uchar>((3.240625 * X) + (-1.537208 * Y) + (-0.498629 * Z));
+            BGR(i, j)[1] = saturate_cast<uchar>((-0.968931 * X) + (1.875756 * Y) + (0.041518 * Z));
+            BGR(i, j)[0] = saturate_cast<uchar>((0.055710 * X) + (-0.204021 * Y) + (1.056996 * Z));
+        }
+    }
+    //normalize(BGR,BGR, 255, 0, NORM_MINMAX, CV_8UC3 );
+    return BGR;
+}
+
+
+int main()
+{
+    Mat3b img = imread("path_to_image");
+
+    Mat3f labb = RGB2LAlphBeta(img);
+
+    Mat3b rgb = LAlphBeta2RGB(labb);
+
+    Mat3b diff;
+    absdiff(img, rgb, diff);
+
+    // Check if all pixels are equals
+    cout << ((sum(diff) == Scalar(0, 0, 0, 0)) ? "Equals" : "Different");
+
+    return 0;
+}
