@@ -204,3 +204,16 @@ int main()
 
     return 0;
 }
+
+https://blog.51cto.com/u_15353042/3751269
+
+https://chaphlagical.icu/DIP/index/report1.pdf
+
+https://arxiv.org/pdf/1711.10662.pdf
+
+https://blog.css8.cn/post/18674723.html
+
+https://wikichi.icu/wiki/LMS_color_space
+https://wikichi.icu/wiki/chromatic_adaptation
+
+https://yylifen.github.io/color-from-hexcodes-to-eyeballs/color/chapter/ch11.html
