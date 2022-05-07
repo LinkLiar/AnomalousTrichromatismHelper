@@ -11,6 +11,10 @@ Mobile端实现思路：Android studio + OpenCV-Android-SDK (Java!!!)
 先从调用手机摄像头开始，后熟悉OpenCV-Android-SDK的Sample
 先从色盲/色弱的理论知识先准备。 
 
+A New Color Blindness Cure Model Based on BP Neural Network
+Visual contents adaptation for colour vision deficiency
+A fixed transformation of color images for dichromats based on similarity matrices
+
 准备知识：
 LSM颜色空间
 人眼LSM视锥细胞
